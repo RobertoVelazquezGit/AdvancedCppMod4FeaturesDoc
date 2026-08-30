@@ -1,3 +1,5 @@
+// C++20 required for coroutines
+
 #include <coroutine>
 #include <iostream>
 
