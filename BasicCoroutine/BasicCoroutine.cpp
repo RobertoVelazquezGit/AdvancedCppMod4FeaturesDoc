@@ -25,6 +25,7 @@ public:
         // REQUIRED NAME.
         // The compiler calls initial_suspend() before executing
         // the body of the coroutine.
+		// When coroutines are first created, they are suspended before executing the body of the coroutine.    
         std::suspend_always initial_suspend()
         {
             return {};
