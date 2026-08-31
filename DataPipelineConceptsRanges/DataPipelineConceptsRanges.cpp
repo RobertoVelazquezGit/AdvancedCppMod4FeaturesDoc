@@ -41,26 +41,6 @@ concept StringLike = std::convertible_to<T, std::string>;
 
 class DataProcessor {
 public:
-    // Original
-    //// Process numeric data with concepts-constrained templates
-    //template<NumericContainer auto container>
-    //auto analyzeData(decltype (container)& data) {
-    //    using ValueType = typename std::remove_cvref_t<decltype(container)>::value_type;
-
-    //    // Use ranges for functional-style processing
-    //    auto positiveValues = data
-    //        | std::views::filter([](const auto& x) { return x > 0; });
-
-    //    auto squares = positiveValues
-    //        | std::views::transform([](const auto& x) { return x * x; });
-
-    //    // Calculate statistics
-    //    ValueType sum = std::accumulate(squares.begin(), squares.end(), ValueType{ 0 });
-    //    size_t count = std::distance(squares.begin(), squares.end());
-
-    //    return std::make_tuple(sum, count, count > 0 ? sum / count : 0);
-    //}
-
     template<NumericContainer Container>
     auto analyzeData(Container& data) {
         using ValueType = typename Container::value_type;
@@ -104,18 +84,10 @@ public:
         // It also has a more modern interface that allows for more flexibility in specifying the sorting criteria.
     }
 
-	// Original
-    // Generic filter with concepts
-    //template<NumericContainer auto container, typename Predicate>
-    //auto filterData(decltype (container)& data, Predicate pred)
-    //    requires std::predicate<Predicate, typename std::remove_cvref_t<decltype(container)>::value_type>
-    //{
-    //    return data | std::views::filter(pred) | std::ranges::to<std::vector>();  // to vector is from c++23
-    //}
     // Generic filter with concepts
     template<NumericContainer Container, typename Predicate>
     auto filterData(Container& data, Predicate pred)
-        requires std::predicate<Predicate, typename Container::value_type>  // ToDo
+        requires std::predicate<Predicate, typename Container::value_type>
     {
         auto filtered = data
             | std::views::filter(pred);
@@ -124,22 +96,6 @@ public:
 
         return std::vector<ValueType>(filtered.begin(), filtered.end());
     }
-
-
-	// Original
-    // Extended data processor with more sophisticated operations
-    //template<NumericContainer auto container>
-    //auto advancedAnalysis(const container& data) {
-    //    namespace rv = std::views;
-
-    //    auto pipeline = data
-    //        | rv::filter([](auto x) { return x > 0; })
-    //        | rv::transform([](auto x) { return x * x; })
-    //        | rv::take(100)  // Process only first 100 positive squares
-    //        | std::ranges::to<std::vector>(); // to vector is from c++23
-
-    //    return pipeline;
-    //}
 
     // Extended data processor with more sophisticated operations
     template<NumericContainer Container>
@@ -154,12 +110,98 @@ public:
 
         using ValueType = typename Container::value_type;
 
-        return std::vector<ValueType>(pipeline.begin(), pipeline.end());
+        // Commented out Visual studio return std::vector<ValueType>(pipeline.begin(), pipeline.end());
+        std::vector<ValueType> result;
+
+        for (const auto& value : pipeline) {
+            result.push_back(value);
+        }
+
+        return result;
     }
 };
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    DataProcessor processor;
+
+    std::vector<int> data{ 5, -3, 8, 1, -7, 4, 10, -2 };
+
+    // ---------------------------------------------------------
+    // 1. analyzeData()
+    // Filters positive values, squares them and calculates:
+    // sum, count and average.
+    // ---------------------------------------------------------
+
+    auto [sum, count, average] = processor.analyzeData(data);
+
+    std::cout << "analyzeData:\n";
+    std::cout << "Sum:     " << sum << '\n';
+    std::cout << "Count:   " << count << '\n';
+    std::cout << "Average: " << average << "\n\n";
+
+
+    // ---------------------------------------------------------
+    // 2. advancedSort()
+    // ---------------------------------------------------------
+
+    auto sortedData = data;
+
+    processor.advancedSort(sortedData);
+
+    std::cout << "Ascending sort:\n";
+
+    for (const auto& value : sortedData)
+        std::cout << value << ' ';
+
+    std::cout << "\n\n";
+
+
+    processor.advancedSort(sortedData, false);
+
+    std::cout << "Descending sort:\n";
+
+    for (const auto& value : sortedData)
+        std::cout << value << ' ';
+
+    std::cout << "\n\n";
+
+
+    // ---------------------------------------------------------
+    // 3. filterData()
+    // Keep only values greater than 3.
+    // ---------------------------------------------------------
+
+    auto filtered = processor.filterData(
+        data,
+        [](int x) {
+            return x > 3;
+        }
+    );
+
+    std::cout << "Filtered values (> 3):\n";
+
+    for (const auto& value : filtered)
+        std::cout << value << ' ';
+
+    std::cout << "\n\n";
+
+
+    // ---------------------------------------------------------
+    // 4. advancedAnalysis()
+    // Keeps positive values, squares them and takes
+    // the first 100 results.
+    // ---------------------------------------------------------
+
+    auto result = processor.advancedAnalysis(data);
+
+    std::cout << "Advanced analysis:\n";
+
+    for (const auto& value : result)
+        std::cout << value << ' ';
+
+    std::cout << '\n';
+
+    return 0;
 }
 
