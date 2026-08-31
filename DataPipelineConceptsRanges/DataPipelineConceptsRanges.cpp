@@ -39,8 +39,6 @@ concept NumericContainer = requires(Container c) {
 template<typename T>
 concept StringLike = std::convertible_to<T, std::string>;
 
-// ToDo
-
 class DataProcessor {
 public:
     // Original
