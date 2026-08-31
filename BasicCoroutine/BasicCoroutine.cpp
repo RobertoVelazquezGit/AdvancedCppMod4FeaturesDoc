@@ -112,7 +112,7 @@ public:
     // "value" is NOT required by the compiler.
     int value() const
     {
-        return handle_.promise().current_value;
+		return handle_.promise().current_value;  // current_value is a variable we defined in promise_type. 
     }
 
 
