@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicCoroutine", "BasicCoroutine\BasicCoroutine.vcxproj", "{2E22C475-0518-42D7-B363-3EAC54C52DC2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConfigManagementSystem", "ConfigManagementSystem\ConfigManagementSystem.vcxproj", "{63DBCD6D-7734-453A-8CAC-93377F15DBCB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataPipelineConceptsRanges", "DataPipelineConceptsRanges\DataPipelineConceptsRanges.vcxproj", "{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{63DBCD6D-7734-453A-8CAC-93377F15DBCB}.Release|x64.Build.0 = Release|x64
 		{63DBCD6D-7734-453A-8CAC-93377F15DBCB}.Release|x86.ActiveCfg = Release|Win32
 		{63DBCD6D-7734-453A-8CAC-93377F15DBCB}.Release|x86.Build.0 = Release|Win32
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Debug|x64.ActiveCfg = Debug|x64
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Debug|x64.Build.0 = Debug|x64
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Debug|x86.ActiveCfg = Debug|Win32
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Debug|x86.Build.0 = Debug|Win32
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Release|x64.ActiveCfg = Release|x64
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Release|x64.Build.0 = Release|x64
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Release|x86.ActiveCfg = Release|Win32
+		{3F67AA51-EC9E-4E96-8DA1-24E35184B2F0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
