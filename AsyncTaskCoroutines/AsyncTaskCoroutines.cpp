@@ -70,6 +70,8 @@ public:
     bool is_ready() const { return coro.done(); }
 };
 
+// ToDo
+
 class AsyncTaskManager {
 private:
     std::queue<std::function<void()>> taskQueue;
@@ -103,23 +105,6 @@ public:
 
         co_return result;
     }
-
-    // Coroutine for batch processing
-    //Task<std::vector<std::string>> batchProcess(const std::vector<int>& dataIds) {
-    //    std::vector<std::string> results;
-
-    //    for (int id : dataIds) {
-    //        auto task = processDataAsync(id, 100 + (id % 500)); // Variable processing time
-    //        while (!task.is_ready()) {
-    //            // Yield control, allowing other coroutines to run
-    //            co_await std::suspend_always{};
-    //        }
-    //        results.push_back(task.get());
-    //    }
-
-    //    co_return results;
-    //}
-
 
     Task<std::vector<std::string>> batchProcess(const std::vector<int>& dataIds) {
         std::vector<Task<std::string>> tasks;
