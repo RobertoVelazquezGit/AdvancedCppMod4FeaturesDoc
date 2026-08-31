@@ -22,7 +22,7 @@ Test with various data types and observe how if constexpr enables compile - time
 class ConfigManager {
 private:
     using ConfigValue = std::variant<int, double, std::string, bool>;
-    std::map<std::string, ConfigValue> settings;
+	std::map<std::string, ConfigValue> settings;  // a map does not have duplicate keys, so it inherently prevents duplicate entries    
 
 public:
     // Load configuration from key-value pairs
@@ -30,8 +30,8 @@ public:
         for (const auto& line : configLines) {
 			// Use structured bindings to destructure the parsing results cleanly
 			// if with initializer to handle optional values    
-            if (auto [key, value] = parseConfigLine(line); key && value) {
-                settings[*key] = *value;
+			if (auto [key, value] = parseConfigLine(line); key && value) {  // key and value are optional, check if they have values    
+				settings[*key] = *value;  // accesing to the values of the optional types using * operator  
             }
         }
     }
@@ -46,8 +46,9 @@ public:
 
         if constexpr (std::is_same_v<T, int>) {
             // Checks whether the variant currently holds a value of the specified type.
-            if (std::holds_alternative<int>(it->second)) {
-                return std::get<int>(it->second);
+            if (std::holds_alternative<int>(it->second)) {                
+				return std::get<int>(it->second);  // accesing a variant when you know the type of the value it holds using std::get<T> 
+                // returning an optional<int>
             }
         }
         else if constexpr (std::is_same_v<T, double>) {
