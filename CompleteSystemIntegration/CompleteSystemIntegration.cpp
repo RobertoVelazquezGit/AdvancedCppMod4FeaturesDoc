@@ -1,81 +1,90 @@
 
 #include "ConfigManager.h"
-/*
-#include <memory>
-#include <filesystem>
 
-class ModernCppApplication {
-private:
-    std::unique_ptr<ConfigManager> configManager;
-    std::unique_ptr<DataProcessor> dataProcessor;
-    std::unique_ptr<AsyncTaskManager> taskManager;
+#include <coroutine>
+#include <exception>
+#include <utility>
 
+class Task {
 public:
-    ModernCppApplication()
-        : configManager(std::make_unique<ConfigManager>())
-        , dataProcessor(std::make_unique<DataProcessor>())
-        , taskManager(std::make_unique<AsyncTaskManager>()) {
-    }
+    // Required name: the compiler looks for Task::promise_type to manage the coroutine.
+    struct promise_type;
 
-    // Integration method using all modern features
-    Task<std::string> runCompleteWorkflow(const std::string& configFile,
-        const std::string& dataFile) {
-        // Load configuration using C++17 features
-        auto config = loadConfigurationAsync(configFile);
-        while (!config.is_ready()) {
-            co_await std::suspend_always{};
+    // Not required by the coroutine protocol; this alias makes the handle type easier to use.
+    using Handle = std::coroutine_handle<promise_type>;
+
+    struct promise_type {
+        // Required: creates the object returned to the caller when the coroutine is invoked.
+        Task get_return_object() {
+            return Task{ Handle::from_promise(*this) };
         }
 
-        // Process data using concepts and ranges
-        auto processingResults = processDataWithModernFeatures(dataFile);
-
-        // Generate comprehensive report
-        std::string report = generateReport(config.get(), processingResults);
-
-        co_return report;
-    }
-
-    Task<std::vector<std::string>> batchProcess(const std::vector<int>& dataIds) {
-        std::vector<Task<std::string>> tasks;
-
-        // Start all tasks concurrently
-        for (int id : dataIds) {
-            tasks.push_back(processDataAsync(id, 100 + (id % 500)));
+        // Required: controls whether execution starts immediately or is initially suspended.
+        // suspend_never makes the coroutine start as soon as it is created.
+        std::suspend_never initial_suspend() noexcept {
+            return {};
         }
 
-        // Collect results
-        std::vector<std::string> results;
-        for (auto& task : tasks) {
-            while (!task.is_ready()) {
-                co_await std::suspend_always{};
+        // Required: controls what happens when the coroutine reaches its end.
+        // suspend_always keeps the coroutine frame alive until its owning Task destroys it.
+        std::suspend_always final_suspend() noexcept {
+            return {};
+        }
+
+        // Required for a coroutine that uses co_return without returning a value.
+        void return_void() noexcept {
+        }
+
+        // Required: handles exceptions that escape from the coroutine body.
+        void unhandled_exception() noexcept {
+            std::terminate();
+        }
+    };
+
+    explicit Task(Handle handle) noexcept
+        : handle_(handle) {
+    }
+
+    ~Task() {
+        if (handle_) {
+            handle_.destroy();
+        }
+    }
+
+    Task(const Task&) = delete;
+    Task& operator=(const Task&) = delete;
+
+    Task(Task&& other) noexcept
+        : handle_(std::exchange(other.handle_, Handle{})) {
+    }
+
+    Task& operator=(Task&& other) noexcept {
+        if (this != &other) {
+            if (handle_) {
+                handle_.destroy();
             }
-            results.push_back(task.get());
+
+            handle_ = std::exchange(other.handle_, Handle{});
         }
 
-        co_return results;
+        return *this;
     }
 
 private:
-    Task<ConfigManager> loadConfigurationAsync(const std::string& filename) {
-        // Implement async configuration loading
-        // Use structured bindings, optional, and variant
-        co_return ConfigManager{};
-    }
-
-    std::vector<std::string> processDataWithModernFeatures(const std::string& filename) {
-        // Implement using concepts, ranges, and other modern features
-        return {};
-    }
-
-    std::string generateReport(const ConfigManager& config,
-        const std::vector<std::string>& results) {
-        // Combine all results into comprehensive report
-        return "";
-    }
+    // Not required by the protocol; Task owns this handle so it can destroy the coroutine frame.
+    Handle handle_;
 };
-*/
+
+Task runCompleteSystemIntegration()
+{
+    // Stage 1: Run the configuration management test bench.
+    runConfigManagerBenchmark();
+
+    co_return;
+}
 
 int main()
 {
-    runConfigManagerBenchmark();
+    auto task = runCompleteSystemIntegration();
+    (void)task;
 }
