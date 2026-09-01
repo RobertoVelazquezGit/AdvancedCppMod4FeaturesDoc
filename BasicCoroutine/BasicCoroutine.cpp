@@ -27,7 +27,7 @@ public:
         // REQUIRED NAME.
         // The compiler calls initial_suspend() before executing
         // the body of the coroutine.
-		// When coroutines are first created, they are suspended before executing the body of the coroutine.    
+        // When coroutines are first created, they are suspended before executing the body of the coroutine.    
         std::suspend_always initial_suspend()
         {
             return {};
@@ -95,6 +95,9 @@ public:
     // USER-DEFINED NAME.
     // "next" is NOT part of the C++ coroutine protocol.
     // We could call it resume(), advance(), etc.
+//Que next() devuelva true significa:
+//He reanudado la coroutine y se ha vuelto a suspender antes de terminar.
+//Por tanto, hay un valor disponible para leer con value().
     bool next()
     {
         if (!handle_ || handle_.done())
@@ -112,7 +115,7 @@ public:
     // "value" is NOT required by the compiler.
     int value() const
     {
-		return handle_.promise().current_value;  // current_value is a variable we defined in promise_type. 
+        return handle_.promise().current_value;  // current_value is a variable we defined in promise_type. 
     }
 
 
@@ -149,7 +152,7 @@ int main()
 
     std::cout << "Generator created\n\n";
 
-	// notice generator.next() return !handle_.done() is false when coroutine is finished,
+    // notice generator.next() return !handle_.done() is false when coroutine is finished,
     // so the loop is not entered and not access to  .value is tried, which would be undefined behavior. 
     while (generator.next())
     {
@@ -157,6 +160,15 @@ int main()
             << generator.value()
             << "\n\n";
     }
+    // El bucle while llama a next() cuatro veces. En las tres primeras llamadas, la coroutine
+    // se reanuda con resume() y avanza hasta el siguiente co_yield (10, 20 y 30 respectivamente).
+    // En cada uno de esos puntos queda suspendida sin haber terminado, por lo que done() es false
+    // y next() devuelve true, permitiendo entrar en el cuerpo del while y leer el valor generado.
+    // En la cuarta llamada a next(), la coroutine todavía entra con done() == false porque estaba
+    // suspendida después del co_yield 30. Se ejecuta resume() una vez más, continúa después de ese
+    // co_yield, imprime "Generator finished" y llega al final de la coroutine. Al alcanzar
+    // final_suspend(), done() pasa a ser true. Por ello, el return !handle_.done() de next()
+    // devuelve false y el cuerpo del while NO se ejecuta una cuarta vez.
 
     return 0;
 }
