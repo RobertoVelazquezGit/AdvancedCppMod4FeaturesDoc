@@ -71,6 +71,17 @@ public:
         return *this;
     }
 
+    // Resume the coroutine if it has not already completed.
+    // Return true when the coroutine remains suspended and can be resumed again.
+    bool resume() {
+        if (!handle_ || handle_.done()) {
+            return false;
+        }
+
+        handle_.resume();
+        return !handle_.done();
+    }
+
 private:
     // Not required by the protocol; Task owns this handle so it can destroy the coroutine frame.
     Handle handle_;
@@ -81,13 +92,17 @@ Task runCompleteSystemIntegration()
     // Stage 1: Run the configuration management test bench.
     runConfigManagerBenchmark();
 
-    co_return;
+    // Suspend the coroutine before starting the next stage.
+    co_await std::suspend_always{};
+
+    // Stage 2: Run the concepts and ranges test bench.
+    runConceptsRanges();
 }
 
 int main()
 {
     auto task = runCompleteSystemIntegration();
-    (void)task;
 
-    runConceptsRanges();
+    // Resume the coroutine to execute Stage 2.
+    task.resume();
 }
