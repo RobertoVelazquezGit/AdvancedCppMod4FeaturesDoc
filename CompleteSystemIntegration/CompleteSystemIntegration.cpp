@@ -1,14 +1,16 @@
 
 #include "ConfigManager.h"
 #include "ConceptsRanges.h"
+#include "AsyncTaskCoro.h"
 
 #include <coroutine>
 #include <exception>
+#include <iostream>
 #include <utility>
 
-class Task {
+class TaskInteg {
 public:
-    // Required name: the compiler looks for Task::promise_type to manage the coroutine.
+    // Required name: the compiler looks for TaskInteg::promise_type to manage the coroutine.
     struct promise_type;
 
     // Not required by the coroutine protocol; this alias makes the handle type easier to use.
@@ -16,8 +18,8 @@ public:
 
     struct promise_type {
         // Required: creates the object returned to the caller when the coroutine is invoked.
-        Task get_return_object() {
-            return Task{ Handle::from_promise(*this) };
+        TaskInteg get_return_object() {
+            return TaskInteg{ Handle::from_promise(*this) };
         }
 
         // Required: controls whether execution starts immediately or is initially suspended.
@@ -27,7 +29,7 @@ public:
         }
 
         // Required: controls what happens when the coroutine reaches its end.
-        // suspend_always keeps the coroutine frame alive until its owning Task destroys it.
+        // suspend_always keeps the coroutine frame alive until its owning TaskInteg destroys it.
         std::suspend_always final_suspend() noexcept {
             return {};
         }
@@ -42,24 +44,24 @@ public:
         }
     };
 
-    explicit Task(Handle handle) noexcept
+    explicit TaskInteg(Handle handle) noexcept
         : handle_(handle) {
     }
 
-    ~Task() {
+    ~TaskInteg() {
         if (handle_) {
             handle_.destroy();
         }
     }
 
-    Task(const Task&) = delete;
-    Task& operator=(const Task&) = delete;
+    TaskInteg(const TaskInteg&) = delete;
+    TaskInteg& operator=(const TaskInteg&) = delete;
 
-    Task(Task&& other) noexcept
+    TaskInteg(TaskInteg&& other) noexcept
         : handle_(std::exchange(other.handle_, Handle{})) {
     }
 
-    Task& operator=(Task&& other) noexcept {
+    TaskInteg& operator=(TaskInteg&& other) noexcept {
         if (this != &other) {
             if (handle_) {
                 handle_.destroy();
@@ -83,11 +85,11 @@ public:
     }
 
 private:
-    // Not required by the protocol; Task owns this handle so it can destroy the coroutine frame.
+    // Not required by the protocol; TaskInteg owns this handle so it can destroy the coroutine frame.
     Handle handle_;
 };
 
-Task runCompleteSystemIntegration()
+TaskInteg runCompleteSystemIntegration()
 {
     // Stage 1: Run the configuration management test bench.
     runConfigManagerBenchmark();
@@ -97,12 +99,27 @@ Task runCompleteSystemIntegration()
 
     // Stage 2: Run the concepts and ranges test bench.
     runConceptsRanges();
+
+    // Suspend the coroutine before starting the next stage.
+    co_await std::suspend_always{};
+
+    // Stage 3: Run the asynchronous task coroutine test bench.
+    runAsyncTaskCoro();
 }
 
 int main()
 {
     auto task = runCompleteSystemIntegration();
 
-    // Resume the coroutine to execute Stage 2.
-    task.resume();
+    // Resume the coroutine to execute Stage 2 and suspend before Stage 3.
+    // This returns true because the coroutine suspends again before Stage 3.
+    bool stage2CanResume = task.resume();
+    std::cout << "Stage 2 resume returned: "
+        << std::boolalpha << stage2CanResume << '\n';
+
+    // Resume the coroutine again to execute Stage 3.
+    // This returns false because the coroutine completes after Stage 3.
+    bool stage3CanResume = task.resume();
+    std::cout << "Stage 3 resume returned: "
+        << std::boolalpha << stage3CanResume << '\n';
 }

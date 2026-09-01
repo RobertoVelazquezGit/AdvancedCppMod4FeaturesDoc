@@ -124,11 +124,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTaskCoro.cpp" />
     <ClCompile Include="CompleteSystemIntegration.cpp" />
     <ClCompile Include="ConceptsRanges.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncTaskCoro.h" />
     <ClInclude Include="ConceptsRanges.h" />
     <ClInclude Include="ConfigManager.h" />
   </ItemGroup>

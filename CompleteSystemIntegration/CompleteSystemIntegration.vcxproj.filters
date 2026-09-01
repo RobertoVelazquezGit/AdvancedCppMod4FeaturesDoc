@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTaskCoro.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CompleteSystemIntegration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -26,6 +29,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncTaskCoro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ConceptsRanges.h">
       <Filter>Header Files</Filter>
     </ClInclude>
