@@ -1,5 +1,6 @@
 
 #include "ConfigManager.h"
+#include "ConceptsRanges.h"
 
 #include <coroutine>
 #include <exception>
@@ -87,4 +88,6 @@ int main()
 {
     auto task = runCompleteSystemIntegration();
     (void)task;
+
+    runConceptsRanges();
 }
