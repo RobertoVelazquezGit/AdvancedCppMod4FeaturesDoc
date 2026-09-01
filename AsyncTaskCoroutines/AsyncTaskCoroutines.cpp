@@ -28,10 +28,6 @@ public:
         }
 
         std::suspend_never initial_suspend() { return {}; }
-        // suspend_never here means a different behavior of coro.done()
-        // with suspend_always do not enter into while (!task.is_ready()) { at batchProcess,
-        // i.e., bool is_ready() const { return coro.done(); } return true when coroutine finished
-        // Notice once the coroutine finished, 
         std::suspend_always final_suspend() noexcept  
         {
             return {};
@@ -71,6 +67,7 @@ public:
         if (coro.promise().exception) {
             std::rethrow_exception(coro.promise().exception);
         }
+        // coro.done is checked to true here, so there is indeed a result
         return coro.promise().value;
     }
 
@@ -150,6 +147,8 @@ private:
 int main()
 {
     AsyncTaskManager manager;
+
+	// Notice there is no threading here, all the coroutines are executed in the main thread, and they block the main thread until they finish. 
 
     std::cout << "=== Testing processDataAsync ===\n";
 
