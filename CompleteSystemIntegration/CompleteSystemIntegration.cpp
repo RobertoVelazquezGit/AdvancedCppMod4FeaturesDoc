@@ -1,5 +1,6 @@
 
-#include <iostream>
+#include "ConfigManager.h"
+/*
 #include <memory>
 #include <filesystem>
 
@@ -72,9 +73,9 @@ private:
         return "";
     }
 };
-
+*/
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    runConfigManagerBenchmark();
 }
