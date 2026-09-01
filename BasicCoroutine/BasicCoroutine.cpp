@@ -149,6 +149,8 @@ int main()
 
     std::cout << "Generator created\n\n";
 
+	// notice generator.next() return !handle_.done() is false when coroutine is finished,
+    // so the loop is not entered and not access to  .value is tried, which would be undefined behavior. 
     while (generator.next())
     {
         std::cout << "Received: "

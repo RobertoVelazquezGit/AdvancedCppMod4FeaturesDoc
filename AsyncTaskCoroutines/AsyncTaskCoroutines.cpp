@@ -28,7 +28,14 @@ public:
         }
 
         std::suspend_never initial_suspend() { return {}; }
-        std::suspend_never final_suspend() noexcept { return {}; }
+        // suspend_never here means a different behavior of coro.done()
+        // with suspend_always do not enter into while (!task.is_ready()) { at batchProcess,
+        // i.e., bool is_ready() const { return coro.done(); } return true when coroutine finished
+        // Notice once the coroutine finished, 
+        std::suspend_always final_suspend() noexcept  
+        {
+            return {};
+        }
 
         void return_value(T val) {
             value = std::move(val);
@@ -70,8 +77,6 @@ public:
     bool is_ready() const { return coro.done(); }
 };
 
-// ToDo
-
 class AsyncTaskManager {
 private:
     std::queue<std::function<void()>> taskQueue;
@@ -103,27 +108,33 @@ public:
         std::string result = "Processed data " + std::to_string(id) +
             " in " + std::to_string(processingTimeMs) + "ms";
 
-        co_return result;
+		co_return result;  // this function is a coroutine, so we use co_return to return the result    
     }
 
+	// Coroutine for batch processing   
     Task<std::vector<std::string>> batchProcess(const std::vector<int>& dataIds) {
         std::vector<Task<std::string>> tasks;
 
-        // Start all tasks concurrently
+		// Start all tasks concurrently. This is not true parallelism, but simulates concurrent execution in a coroutine context.   
         for (int id : dataIds) {
-            tasks.push_back(processDataAsync(id, 100 + (id % 500)));
+            // Here the processDataAsync coroutine is created and started, but not awaited yet.
+            // The actual processing will happen when we await the result.     
+			tasks.push_back(processDataAsync(id, 100 + (id % 500)));  
         }
 
         // Collect results
         std::vector<std::string> results;
         for (auto& task : tasks) {
             while (!task.is_ready()) {
-                co_await std::suspend_always{};
+                // Here the batchProcess is suspended forever, but this never happens in this code because in the
+                // tasks.push_back(processDataAsync(id, 100 + (id % 500))); the coroutine is started and terminated.
+				// In fact would be suspended until someone does resume on the coroutine, but since we don't have a scheduler here, this will never happen. 
+                co_await std::suspend_always{};  
             }
             results.push_back(task.get());
         }
 
-        co_return results;
+		co_return results;  // this function is a coroutine, so we use co_return to return the results   
     }
 
 private:
@@ -138,6 +149,45 @@ private:
 
 int main()
 {
-    std::cout << "Hello World!\n";
-}
+    AsyncTaskManager manager;
 
+    std::cout << "=== Testing processDataAsync ===\n";
+
+    // processDataAsync starts immediately because
+    // initial_suspend() returns std::suspend_never.
+    auto task = manager.processDataAsync(1, 500);
+
+    // At this point the coroutine has already finished because
+    // sleep_for() blocks the current thread until processing completes.
+    if (task.is_ready())
+    {
+        std::cout << "Task completed\n";
+        std::cout << task.get() << '\n';
+    }
+
+
+    std::cout << "\n=== Testing batchProcess ===\n";
+
+    std::vector<int> ids{ 1, 2, 3, 4, 5 };
+
+    // batchProcess starts immediately.
+    //
+    // processDataAsync() also starts immediately for every ID and
+    // blocks until it finishes. Therefore, all inner tasks are already
+    // completed when batchProcess reaches the result collection loop.
+    auto batchTask = manager.batchProcess(ids);
+
+    if (batchTask.is_ready())
+    {
+        std::cout << "Batch completed\n";
+
+        auto results = batchTask.get();
+
+        for (const auto& result : results)
+        {
+            std::cout << result << '\n';
+        }
+    }
+
+    return 0;
+}
