@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -49,4 +50,4 @@ private:
 };
 
 // Run the ConfigManager test bench.
-void runConfigManagerBenchmark();
+void runConfigManagerBenchmark(std::shared_ptr<ConfigManager> configManager);

@@ -55,9 +55,7 @@ ConfigManager::parseConfigLine(const std::string& line) {
     return { key, valueStr };
 }
 
-void runConfigManagerBenchmark() {
-    ConfigManager config;
-
+void runConfigManagerBenchmark(std::shared_ptr<ConfigManager> configManager) {
     // Configuration lines.
     std::vector<std::string> configLines = {
         "database_port=5432",
@@ -67,35 +65,35 @@ void runConfigManagerBenchmark() {
     };
 
     // Load configuration.
-    config.loadConfig(configLines);
+    configManager->loadConfig(configLines);
 
-    if (auto port = config.getValue<int>("database_port")) {
+    if (auto port = configManager->getValue<int>("database_port")) {
         std::cout << "Database port: " << *port << '\n';
         std::cout << "Type of port: " << typeid(port).name() << '\n';
         std::cout << "Type of *port: " << typeid(*port).name() << '\n';
     }
 
-    if (auto name = config.getValue<std::string>("app_name")) {
+    if (auto name = configManager->getValue<std::string>("app_name")) {
         std::cout << "Application name: " << *name << '\n';
         std::cout << "Type of name: " << typeid(name).name() << '\n';
         std::cout << "Type of *name: " << typeid(*name).name() << '\n';
     }
 
-    if (auto debug = config.getValue<bool>("debug_mode")) {
+    if (auto debug = configManager->getValue<bool>("debug_mode")) {
         std::cout << "Debug mode: "
             << (*debug ? "true" : "false") << '\n';
         std::cout << "Type of debug: " << typeid(debug).name() << '\n';
         std::cout << "Type of *debug: " << typeid(*debug).name() << '\n';
     }
 
-    if (auto timeout = config.getValue<double>("timeout")) {
+    if (auto timeout = configManager->getValue<double>("timeout")) {
         std::cout << "Timeout: " << *timeout << '\n';
         std::cout << "Type of timeout: " << typeid(timeout).name() << '\n';
         std::cout << "Type of *timeout: " << typeid(*timeout).name() << '\n';
     }
 
     // Try to retrieve a non-existing key.
-    if (auto value = config.getValue<int>("unknown_setting")) {
+    if (auto value = configManager->getValue<int>("unknown_setting")) {
         std::cout << "Value: " << *value << '\n';
     }
     else {

@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <queue>
 #include <stdexcept>
 #include <string>
@@ -118,4 +119,4 @@ private:
 };
 
 // Run the asynchronous task coroutine test bench.
-void runAsyncTaskCoro();
+void runAsyncTaskCoro(std::shared_ptr<AsyncTaskManager> asyncTaskManager);

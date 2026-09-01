@@ -2,9 +2,7 @@
 
 #include <iostream>
 
-void runConceptsRanges() {
-    DataProcessor processor;
-
+void runConceptsRanges(std::shared_ptr<DataProcessor> dataProcessor) {
     std::vector<int> data{ 5, -3, 8, 1, -7, 4, 10, -2 };
 
     // ---------------------------------------------------------
@@ -13,7 +11,7 @@ void runConceptsRanges() {
     // sum, count and average.
     // ---------------------------------------------------------
 
-    auto [sum, count, average] = processor.analyzeData(data);
+    auto [sum, count, average] = dataProcessor->analyzeData(data);
 
     std::cout << "analyzeData:\n";
     std::cout << "Sum:     " << sum << '\n';
@@ -26,7 +24,7 @@ void runConceptsRanges() {
 
     auto sortedData = data;
 
-    processor.advancedSort(sortedData);
+    dataProcessor->advancedSort(sortedData);
 
     std::cout << "Ascending sort:\n";
 
@@ -36,7 +34,7 @@ void runConceptsRanges() {
 
     std::cout << "\n\n";
 
-    processor.advancedSort(sortedData, false);
+    dataProcessor->advancedSort(sortedData, false);
 
     std::cout << "Descending sort:\n";
 
@@ -51,7 +49,7 @@ void runConceptsRanges() {
     // Keep only values greater than 3.
     // ---------------------------------------------------------
 
-    auto filtered = processor.filterData(
+    auto filtered = dataProcessor->filterData(
         data,
         [](int x) {
             return x > 3;
@@ -72,7 +70,7 @@ void runConceptsRanges() {
     // the first 100 results.
     // ---------------------------------------------------------
 
-    auto result = processor.advancedAnalysis(data);
+    auto result = dataProcessor->advancedAnalysis(data);
 
     std::cout << "Advanced analysis:\n";
 

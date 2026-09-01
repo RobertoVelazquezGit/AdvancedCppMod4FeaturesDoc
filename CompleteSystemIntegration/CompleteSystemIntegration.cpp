@@ -6,6 +6,7 @@
 #include <coroutine>
 #include <exception>
 #include <iostream>
+#include <memory>
 #include <utility>
 
 class TaskInteg {
@@ -92,19 +93,22 @@ private:
 TaskInteg runCompleteSystemIntegration()
 {
     // Stage 1: Run the configuration management test bench.
-    runConfigManagerBenchmark();
+    auto configManager = std::make_shared<ConfigManager>();
+    runConfigManagerBenchmark(configManager);
 
     // Suspend the coroutine before starting the next stage.
     co_await std::suspend_always{};
 
     // Stage 2: Run the concepts and ranges test bench.
-    runConceptsRanges();
+    auto dataProcessor = std::make_shared<DataProcessor>();
+    runConceptsRanges(dataProcessor);
 
     // Suspend the coroutine before starting the next stage.
     co_await std::suspend_always{};
 
     // Stage 3: Run the asynchronous task coroutine test bench.
-    runAsyncTaskCoro();
+    auto asyncTaskManager = std::make_shared<AsyncTaskManager>();
+    runAsyncTaskCoro(asyncTaskManager);
 }
 
 int main()

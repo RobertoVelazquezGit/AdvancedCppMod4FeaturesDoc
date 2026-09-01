@@ -67,16 +67,14 @@ void AsyncTaskManager::workerLoop() {
     }
 }
 
-void runAsyncTaskCoro() {
-    AsyncTaskManager manager;
-
+void runAsyncTaskCoro(std::shared_ptr<AsyncTaskManager> asyncTaskManager) {
     // There is no asynchronous threading in these coroutine calls. They run
     // on the main thread and block it until their work has finished.
     std::cout << "=== Testing processDataAsync ===\n";
 
     // processDataAsync starts immediately because initial_suspend()
     // returns std::suspend_never.
-    auto task = manager.processDataAsync(1, 500);
+    auto task = asyncTaskManager->processDataAsync(1, 500);
 
     // The coroutine has already finished because sleep_for() blocks the
     // current thread until processing completes.
@@ -92,7 +90,7 @@ void runAsyncTaskCoro() {
     // batchProcess starts immediately. processDataAsync() also starts
     // immediately for every ID, so all inner tasks have completed when
     // batchProcess reaches its result collection loop.
-    auto batchTask = manager.batchProcess(ids);
+    auto batchTask = asyncTaskManager->batchProcess(ids);
 
     if (batchTask.is_ready()) {
         std::cout << "Batch completed\n";

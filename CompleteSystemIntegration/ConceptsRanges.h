@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <numeric>
 #include <ranges>
 #include <string>
@@ -119,4 +120,4 @@ public:
 };
 
 // Run the concepts and ranges test bench.
-void runConceptsRanges();
+void runConceptsRanges(std::shared_ptr<DataProcessor> dataProcessor);
